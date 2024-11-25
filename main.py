@@ -9,9 +9,11 @@ def index():
 
 @app.route('/login', methods = ['POST', 'GET'])
 def login():
-    username = request.form["nm"]
-    print(username)
-    print({"ip":request.remote_addr})
+    if request.method == "POST":
+        username = request.form["nm"]
+        print(username)
+        print({"ip":request.remote_addr})
+        return redirect(url_for("login"))
     return render_template("login.html")
 
 @app.route('/<usr>')
