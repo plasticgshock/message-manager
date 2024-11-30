@@ -18,7 +18,7 @@ def login():
         message = request.form["nm"]
         print(message)
         print(request.remote_addr)
-        data = {"request_id":1, #by default, to be changed into count
+        data = {"request_id":1, #by default, to be changed into counter
                 "content": message,
                 "timestamp": datetime.now(),
                 "ip":request.remote_addr,
