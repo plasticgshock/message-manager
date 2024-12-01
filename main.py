@@ -2,6 +2,9 @@ from flask import Flask, request, render_template, redirect, url_for
 import psycopg2 
 from datetime import datetime
 
+from dbcrud import insert
+
+
 def printdict(dict):
     for key in dict:
         print(f"{key} : {dict[key]}")
@@ -18,13 +21,12 @@ def login():
         message = request.form["nm"]
         print(message)
         print(request.remote_addr)
-        data = {"request_id":1, #by default, to be changed into counter
-                "content": message,
-                "timestamp": datetime.now(),
+        data = {"content": message,
                 "ip":request.remote_addr,
                 "user_agent":request.headers.get("User-Agent")
                 }
         printdict(data)
+        insert(data["content"], data["ip"], data["user_agent"])
         return redirect(url_for("login"))
     return render_template("login.html")
 
