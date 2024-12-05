@@ -11,11 +11,13 @@ def printdict(dict):
 
 app = Flask(__name__)
 
+
 @app.route('/')
 def index():
     return "hello world"
 
-@app.route('/login', methods = ['POST', 'GET'])
+
+@app.route('/send', methods = ['POST', 'GET'])
 def login():
     if request.method == "POST":
         message = request.form["nm"]
@@ -30,7 +32,8 @@ def login():
         return redirect(url_for("login"))
     return render_template("login.html")
 
-@app.route('/<usr>')
+
+@app.route('/messages')
 def user(usr):
     return f"<h1>{usr}, you've successfuly logged in!</h1>"
 

@@ -1,14 +1,27 @@
 import psycopg2
 from psycopg2 import Error
+from configparser import ConfigParser
+
+
+
+def parse_db_config(filename='db_config.ini', section='postgresql'):
+    parser = ConfigParser()
+    parser.read(filename)
+
+    db_config = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db_config[param[0]] = param[1]
+    else:
+        raise Exception(f"Section {section} not found in the {filename} file")
+
+    return db_config
 
 
 def insert(content:str, ip_address:str, user_agent:str):
-    db_config = {"user":"postgres",
-            "password":"6969",
-            "host":"127.0.0.1",
-            "port":"5432",
-            "database":"messagemanager_db"}
     try:
+        db_config = parse_db_config()
         connection = psycopg2.connect(**db_config)
         cursor = connection.cursor()
 
@@ -23,3 +36,32 @@ def insert(content:str, ip_address:str, user_agent:str):
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
+
+
+def getmessages():
+    connection = None 
+    try:
+        params = parse_db_config()
+        connection = psycopg2.connect(**params)
+        cursor = connection.cursor()
+        cursor.execute('''SELECT * FROM requests ORDER BY timestamp DESC LIMIT 10;''')
+        messages = cursor.fetchall()
+        str_messages = ''
+        for i in range(0,9):
+            print(messages[i])
+            if i!=9:
+                str_messages+='\n'
+        print(str_messages)
+        connection.commit()
+        print("Successfully retrieved data")
+
+    except (Exception, Error) as error:
+        print("Error while connecting to PostgreSQL:", error)
+    finally:
+        if connection:
+            cursor.close()
+            connection.close()
+            print("PostgreSQL connection is closed")
+
+
+getmessages()
