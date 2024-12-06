@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for
 import psycopg2 
 from datetime import datetime
 
-from dbcrud import insert
+import dbcrud
 
 
 def printdict(dict):
@@ -28,14 +28,15 @@ def login():
                 "user_agent":request.headers.get("User-Agent")
                 }
         printdict(data)
-        insert(data["content"], data["ip"], data["user_agent"])
+        dbcrud.insert(data["content"], data["ip"], data["user_agent"])
         return redirect(url_for("login"))
     return render_template("login.html")
 
 
 @app.route('/messages')
-def user(usr):
-    return f"<h1>{usr}, you've successfuly logged in!</h1>"
+def DisplayMessages():
+    parsedMessages = dbcrud.getmessages()
+    return parsedMessages
 
 if __name__ == '__main__':
     app.run(debug=True)

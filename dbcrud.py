@@ -1,6 +1,12 @@
 import psycopg2
 from psycopg2 import Error
 from configparser import ConfigParser
+import datetime
+
+# Given datetime object
+def ManageDateOutput(dt:datetime):
+    formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
+    return formatted_time
 
 
 
@@ -46,14 +52,14 @@ def getmessages():
         cursor = connection.cursor()
         cursor.execute('''SELECT * FROM requests ORDER BY timestamp DESC LIMIT 10;''')
         messages = cursor.fetchall()
-        str_messages = ''
-        for i in range(0,9):
-            print(messages[i])
-            if i!=9:
-                str_messages+='\n'
-        print(str_messages)
+        s = ""
+        for i in range(10):
+            s += " | ".join(map(str, messages[i]))
+            if i!= 9:
+                s+="\n\n"
         connection.commit()
         print("Successfully retrieved data")
+        return s
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", error)
@@ -62,6 +68,3 @@ def getmessages():
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
-
-
-getmessages()
