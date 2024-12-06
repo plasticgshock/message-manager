@@ -1,13 +1,13 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 import psycopg2 
 from datetime import datetime
-
 import dbcrud
 
 
 def printdict(dict):
     for key in dict:
         print(f"{key} : {dict[key]}")
+
 
 app = Flask(__name__)
 
@@ -36,7 +36,7 @@ def login():
 @app.route('/messages')
 def DisplayMessages():
     parsedMessages = dbcrud.getmessages()
-    return parsedMessages
+    return jsonify(parsedMessages)
 
 if __name__ == '__main__':
     app.run(debug=True)
