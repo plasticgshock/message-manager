@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-import psycopg2 
+import psycopg2
 from datetime import datetime
 import dbcrud
 
