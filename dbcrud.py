@@ -1,7 +1,9 @@
 import psycopg2
 from psycopg2 import Error
 from configparser import ConfigParser
+from flask import Flask, jsonify, request
 import datetime
+
 
 # Given datetime object
 def ManageDateOutput(dt:datetime):
@@ -9,11 +11,9 @@ def ManageDateOutput(dt:datetime):
     return formatted_time
 
 
-
 def parse_db_config(filename='db_config.ini', section='postgresql'):
     parser = ConfigParser()
     parser.read(filename)
-
     db_config = {}
     if parser.has_section(section):
         params = parser.items(section)
@@ -30,7 +30,6 @@ def insert(content:str, ip_address:str, user_agent:str):
         db_config = parse_db_config()
         connection = psycopg2.connect(**db_config)
         cursor = connection.cursor()
-
         cursor.execute(f'''INSERT INTO requests (content, ip_address, user_agent)
                        VALUES ('{content}', '{ip_address}', '{user_agent}' )''')
         connection.commit()
@@ -58,6 +57,7 @@ def getmessages():
         connection.commit()
         print("Successfully retrieved data")
         return s
+    
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", error)
