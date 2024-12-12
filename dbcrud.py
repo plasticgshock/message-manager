@@ -51,8 +51,13 @@ def getmessages():
         cursor = connection.cursor()
         cursor.execute('''SELECT * FROM requests ORDER BY timestamp DESC LIMIT 10;''')
         messages = cursor.fetchall()
-        s = [0]*10
-        for i in range(10):
+        print("messages fetched")
+        if len(messages)<10:
+            l = len(messages)
+        else:
+            l = 10
+        s = [0]*l
+        for i in range(l):
             s[i] = messages[i]
         connection.commit()
         print("Successfully retrieved data")
@@ -67,5 +72,3 @@ def getmessages():
             connection.close()
             print("PostgreSQL connection is closed")
 
-
-getmessages()
