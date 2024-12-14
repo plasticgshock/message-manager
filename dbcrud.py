@@ -2,13 +2,22 @@ import psycopg2
 from psycopg2 import Error
 from configparser import ConfigParser
 from flask import Flask, jsonify, request
-import datetime
 
 
-# Given datetime object
-def ManageDateOutput(dt:datetime):
-    formatted_time = dt.strftime("%Y-%m-%d %H:%M:%S")
-    return formatted_time
+app = Flask(__name__)
+
+
+@app.route('/api-access', methods=['POST', 'GET'])
+def process_request():
+    data = request.json.get('data')
+    ip = request.json.get('ip')
+    agent = request.json.get('agent')
+    if data:
+        response = write_messages(data, ip, agent)
+        print(f"your data: {data}")
+        return jsonify({'response': response})
+    else:
+        return jsonify({'error':'no data provided!'}), 400
 
 
 def parse_db_config(filename='db_config.ini', section='postgresql'):
@@ -25,19 +34,19 @@ def parse_db_config(filename='db_config.ini', section='postgresql'):
     return db_config
 
 
-def insert(content:str, ip_address:str, user_agent:str):
+def write_messages(data, ip, agent):
     try:
-        db_config = parse_db_config()
+        db_config = parse_db_config() # to be removed and rewritten so that the connection is always opened
         connection = psycopg2.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute(f'''INSERT INTO requests (content, ip_address, user_agent)
-                       VALUES ('{content}', '{ip_address}', '{user_agent}' )''')
+                       VALUES ('{data}', '{ip}', '{agent}' )''')
         connection.commit()
-        print("successfully added data")
+        return "successfully added data"
     except (Exception, Error) as error:
-        print("Error while connecting to PostgreSQL:", error)
+        return "Error while writing to PostgreSQL: "+error
     finally:
-        if (connection):
+        if (connection):# to be removed and rewritten so that the connection is always opened
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
@@ -72,3 +81,6 @@ def getmessages():
             connection.close()
             print("PostgreSQL connection is closed")
 
+if __name__ == '__main__':
+    app.run(debug=True, port=5002)
+    
