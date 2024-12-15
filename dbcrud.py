@@ -9,15 +9,18 @@ app = Flask(__name__)
 
 @app.route('/api-access', methods=['POST', 'GET'])
 def process_request():
-    data = request.json.get('data')
-    ip = request.json.get('ip')
-    agent = request.json.get('agent')
-    if data:
-        response = write_messages(data, ip, agent)
-        print(f"your data: {data}")
-        return jsonify({'response': response})
-    else:
-        return jsonify({'error':'no data provided!'}), 400
+    if request.json.get('req') == 'create':
+        data = request.json.get('data')
+        ip = request.json.get('ip')
+        agent = request.json.get('agent')
+        if data and ip and agent:
+            response = write_messages(data, ip, agent)
+            print(f"your data: {data}")
+            return jsonify({'response': response})
+        else:
+            return jsonify({'error':'no data provided!'}), 400
+    elif request.json.get('req') == 'read':
+        return jsonify(getmessages())
 
 
 def parse_db_config(filename='db_config.ini', section='postgresql'):
