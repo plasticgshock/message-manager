@@ -60,8 +60,22 @@ def send():
 
 @app.route('/messages')
 def DisplayMessages():
-    parsedMessages = dbcrud.getmessages()
-    return jsonify(parsedMessages)
+    headers = {'Content-Type': 'application/json'}
+    SERVER_URL = 'http://127.0.0.1:5002/api-access'
+    
+    # Create the request payload
+    payload = json.dumps({'req':'read'})
+    
+    # Send the POST request to the server
+    response = requests.post(SERVER_URL, data=payload, headers=headers)
+    
+    if response.status_code == 200:
+        # Parse the JSON response from the server
+        messages = response.json().get('response')
+        print(f"Response from the server: {messages}")
+    else:
+        print(f"Error:", response.json().get('error'))
+    return jsonify(messages)
 
 if __name__ == '__main__':
     app.run(debug=True)

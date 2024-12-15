@@ -20,7 +20,7 @@ def process_request():
         else:
             return jsonify({'error':'no data provided!'}), 400
     elif request.json.get('req') == 'read':
-        return jsonify(getmessages())
+        return jsonify({'response':getmessages()})
 
 
 def parse_db_config(filename='db_config.ini', section='postgresql'):
@@ -67,15 +67,14 @@ def getmessages():
         if len(messages)<10:
             l = len(messages)
         else:
-            l = 10
+                l = 10
         s = [0]*l
+        dict0 = {}
         for i in range(l):
-            s[i] = messages[i]
+            dict0[messages[i][0]] = [messages[i][j] for j in range(1,5)]
         connection.commit()
         print("Successfully retrieved data")
-        return s
-    
-
+        return dict0
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", error)
     finally:
