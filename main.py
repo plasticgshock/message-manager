@@ -10,7 +10,7 @@ def write_to_db(content, user_ip, user_agent):
     SERVER_URL = 'http://127.0.0.1:5002/api-access'
     
     # Create the request payload
-    payload = json.dumps({'reqtype':'create', 'data':content, 'ip':user_ip, 'agent': user_agent})
+    payload = json.dumps({'req':'create', 'data':content, 'ip':user_ip, 'agent': user_agent})
     
     # Send the POST request to the server
     response = requests.post(SERVER_URL, data=payload, headers=headers)
@@ -46,7 +46,7 @@ def index():
 def send():
     if request.method == "POST":
         SERVER_URL = 'http://127.0.0.1:5000/api-access'
-        message = request.form["nm"]
+        message = request.form["ms"]
         data = {"content": message,
                 "ip":request.remote_addr,
                 "user_agent":request.headers.get("User-Agent")
@@ -55,7 +55,7 @@ def send():
         print(data)
         write_to_db(data["content"], data["ip"], data["user_agent"])
         return redirect(url_for("send"))
-    return render_template("login.html")
+    return render_template("sendmessage.html")
 
 
 @app.route('/messages')
