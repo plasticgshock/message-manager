@@ -22,17 +22,6 @@ def write_to_db(content, user_ip, user_agent):
     else:
         print(f"Error:", response.json().get('error'))
 
-def read_from_db():
-    header = {'Content-Type': 'application/json'}
-    SERVER_URL = 'http://127.0.0.1:5002/api-access/read'
-
-    payload = json.dumps({'request':'read'})
-    response = request.post()
-
-def printdict(dict):
-    for key in dict:
-        print(f"{key} : {dict[key]}")
-
 
 app = Flask(__name__)
 
@@ -45,13 +34,11 @@ def index():
 @app.route('/send', methods = ['POST', 'GET'])
 def send():
     if request.method == "POST":
-        SERVER_URL = 'http://127.0.0.1:5000/api-access'
         message = request.form["ms"]
         data = {"content": message,
                 "ip":request.remote_addr,
                 "user_agent":request.headers.get("User-Agent")
                 }
-        printdict(data)
         print(data)
         write_to_db(data["content"], data["ip"], data["user_agent"])
         return redirect(url_for("send"))
@@ -73,9 +60,11 @@ def DisplayMessages():
         # Parse the JSON response from the server
         messages = response.json().get('response')
         print(f"Response from the server: {messages}")
+        reversed_messages = dict(reversed(list(messages.items())))
+        return render_template('displaymessages.html', messages=reversed_messages)
     else:
         print(f"Error:", response.json().get('error'))
-    return jsonify(messages)
+        return jsonify({'Error!':'error connecting to the db'})
 
 if __name__ == '__main__':
     app.run(debug=True)

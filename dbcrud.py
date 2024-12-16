@@ -74,7 +74,7 @@ def getmessages():
             dict0[messages[i][0]] = [messages[i][j] for j in range(1,5)]
         connection.commit()
         print("Successfully retrieved data")
-        return dict0
+        return dict(reversed(list(dict0.items())))
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", error)
     finally:
