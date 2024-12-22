@@ -1,0 +1,20 @@
+# Use the official Python image
+FROM python:3.9-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy requirements file and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the files into the container
+COPY main.py /app/
+COPY requirements.txt /app/
+COPY templates/ /app/templates/
+
+# Expose the Flask app's port
+EXPOSE 5000
+
+# Run the Flask app
+CMD ["python", "dbcrud.py"]
