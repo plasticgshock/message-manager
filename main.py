@@ -19,6 +19,7 @@ def write_to_db(content, user_ip, user_agent):
         # Parse the JSON response from the server
         status = response.json().get('response')
         print(f"Response from the server: {status}")
+        
     else:
         print(f"Error:", response.json().get('error'))
 
@@ -65,6 +66,12 @@ def DisplayMessages():
     else:
         print(f"Error:", response.json().get('error'))
         return jsonify({'Error!':'error connecting to the db'})
+    
+
+@app.route('/test')
+def test():
+    messages={1:['text','date', 'ip', 'client' ]}
+    return render_template("test.html", messages =messages)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

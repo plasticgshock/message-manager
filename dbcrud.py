@@ -9,6 +9,8 @@ app = Flask(__name__)
 
 @app.route('/api-access', methods=['POST', 'GET'])
 def process_request():
+    if request.method == 'GET':
+        return "dbcrud page"
     if request.json.get('req') == 'create':
         data = request.json.get('data')
         ip = request.json.get('ip')
@@ -84,5 +86,5 @@ def getmessages():
             print("PostgreSQL connection is closed")
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    app.run(host='0.0.0.0', debug=True, port=5002)
     
