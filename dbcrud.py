@@ -1,5 +1,6 @@
 import psycopg2
 from psycopg2 import Error
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from configparser import ConfigParser
 from flask import Flask, jsonify, request
 
@@ -7,8 +8,56 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 
+def createtable():
+    db_config = parse_db_config()
+    try:
+        connection = psycopg2.connect(**db_config)
+        connection.autocommit = True
+        cursor = connection.cursor()
+        cursor.execute('''CREATE TABLE requests (
+                        request_id SERIAL PRIMARY KEY,
+                        content TEXT NOT NULL, 
+                        timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+                        ip_address VARCHAR(45) NOT NULL, 
+                        user_agent TEXT
+                    );''')
+        print("Table created")
+    except (Exception, Error) as error:
+        print(f"Error while creating table: {error}")        
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def dbcheck():
+    db_config = parse_db_config()
+    db_config['database'] = 'postgres'
+    try:
+        connection = psycopg2.connect(**db_config)
+        connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        connection.autocommit = True
+        cursor = connection.cursor()
+        #check if db exists
+        cursor.execute("SELECT 1 FROM pg_database WHERE datname = 'messagemanager_db';")
+        if not cursor.fetchone():
+            # Create the database as it doesn't exist
+            cursor.execute("CREATE DATABASE messagemanager_db;")
+            print("Database 'messagemanager_db' created.")
+            createtable()
+        else:
+            print("Database exists")
+    except (Exception, Error) as error:
+        return (f"Error while checking PostgreSQL database: {error}")
+    finally:
+        if (connection):
+            cursor.close()
+            connection.close()
+            print("Database checked")
+
+
 @app.route('/api-access', methods=['POST', 'GET'])
 def process_request():
+    dbcheck()
     if request.method == 'GET':
         return "dbcrud page"
     if request.json.get('req') == 'create':
@@ -41,7 +90,7 @@ def parse_db_config(filename='db_config.ini', section='postgresql'):
 
 def write_messages(data, ip, agent):
     try:
-        db_config = parse_db_config() # to be removed and rewritten so that the connection is always opened
+        db_config = parse_db_config()   # to be removed and rewritten so that the connection is always opened
         connection = psycopg2.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute(f'''INSERT INTO requests (content, ip_address, user_agent)
@@ -51,7 +100,7 @@ def write_messages(data, ip, agent):
     except (Exception, Error) as error:
         return "Error while writing to PostgreSQL: "+error
     finally:
-        if (connection):# to be removed and rewritten so that the connection is always opened
+        if (connection):    # to be removed and rewritten so that the connection is always opened
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
@@ -85,6 +134,6 @@ def getmessages():
             connection.close()
             print("PostgreSQL connection is closed")
 
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=5002)
-    
+    app.run(debug=True, port=5002)
