@@ -1,14 +1,13 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from datetime import datetime
-import dbcrud
 import requests
 import json
+import os
 
+BACKEND_URL = 'http://127.0.0.1:5002'
 
 def write_to_db(content, user_ip, user_agent):
     headers = {'Content-Type': 'application/json'}
-    SERVER_URL = 'http://127.0.0.1:5002/api-access'
-    
+    SERVER_URL = f'{BACKEND_URL}/api-access'
     # Create the request payload
     payload = json.dumps({'req':'create', 'data':content, 'ip':user_ip, 'agent': user_agent})
     
@@ -19,7 +18,6 @@ def write_to_db(content, user_ip, user_agent):
         # Parse the JSON response from the server
         status = response.json().get('response')
         print(f"Response from the server: {status}")
-        
     else:
         print(f"Error:", response.json().get('error'))
 
@@ -49,7 +47,7 @@ def send():
 @app.route('/messages')
 def DisplayMessages():
     headers = {'Content-Type': 'application/json'}
-    SERVER_URL = 'http://127.0.0.1:5002/api-access'
+    SERVER_URL = f'{BACKEND_URL}/api-access'
     
     # Create the request payload
     payload = json.dumps({'req':'read'})
@@ -60,7 +58,7 @@ def DisplayMessages():
     if response.status_code == 200:
         # Parse the JSON response from the server
         messages = response.json().get('response')
-        print(f"Response from the server: {messages}")
+        print(f"Response from the server received")
         reversed_messages = dict(reversed(list(messages.items())))
         return render_template('displaymessages.html', messages=reversed_messages)
     else:
@@ -74,4 +72,4 @@ def test():
     return render_template("test.html", messages =messages)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(port=5000, debug=True)
