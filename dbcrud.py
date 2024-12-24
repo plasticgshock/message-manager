@@ -74,7 +74,7 @@ def process_request():
         return jsonify({'response':getmessages()})
 
 
-def parse_db_config(filename='db_config.ini', section='postgresql'):
+def parse_db_config(filename='.gitignore/db_config.ini', section='postgresql'):
     parser = ConfigParser()
     parser.read(filename)
     db_config = {}
