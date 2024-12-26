@@ -25,8 +25,9 @@ def createtable():
     except (Exception, Error) as error:
         print(f"Error while creating table: {error}")        
     finally:
-        cursor.close()
-        connection.close()
+        if (connection):
+            cursor.close()
+            connection.close()
 
 
 def dbcheck():
@@ -34,6 +35,7 @@ def dbcheck():
     db_config['database'] = 'postgres'
     try:
         connection = psycopg2.connect(**db_config)
+        print("Connected to Postgres!")
         connection.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         connection.autocommit = True
         cursor = connection.cursor()
@@ -74,7 +76,7 @@ def process_request():
         return jsonify({'response':getmessages()})
 
 
-def parse_db_config(filename='db_config.ini', section='postgresql'):
+def parse_db_config(filename='.gitignore/db_config.ini', section='postgresql'):
     parser = ConfigParser()
     parser.read(filename)
     db_config = {}
@@ -82,6 +84,7 @@ def parse_db_config(filename='db_config.ini', section='postgresql'):
         params = parser.items(section)
         for param in params:
             db_config[param[0]] = param[1]
+        print(db_config)
     else:
         raise Exception(f"Section {section} not found in the {filename} file")
 
@@ -90,7 +93,8 @@ def parse_db_config(filename='db_config.ini', section='postgresql'):
 
 def write_messages(data, ip, agent):
     try:
-        db_config = parse_db_config()   # to be removed and rewritten so that the connection is always opened
+        connection = None
+        db_config = parse_db_config()   
         connection = psycopg2.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute(f'''INSERT INTO requests (content, ip_address, user_agent)
@@ -100,7 +104,7 @@ def write_messages(data, ip, agent):
     except (Exception, Error) as error:
         return "Error while writing to PostgreSQL: "+error
     finally:
-        if (connection):    # to be removed and rewritten so that the connection is always opened
+        if (connection):  
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
@@ -136,4 +140,4 @@ def getmessages():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5002)
+    app.run(host="0.0.0.0", debug=True, port=5002)

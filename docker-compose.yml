@@ -1,0 +1,42 @@
+version: "v2.32.1"
+services:
+  db:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 6969
+      POSTGRES_DB: postgres
+    ports: 
+    - "5432:5432"
+    volumes:
+    - db_data:/var/lib/postgresql/data
+
+
+  back:
+    build:
+      context: .
+      dockerfile: Dockerfile_back
+    container_name: backend 
+    depends_on:
+      - db
+    volumes:
+      - .gitignore/db_config.ini:/app/dbconfig.ini
+    ports:
+      - "5002:5002"
+
+
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile_front
+    container_name: frontend
+    depends_on:
+      - back
+    volumes:
+      - ./templates:/app/templates
+    ports:
+      - "5000:5000"
+
+volumes:
+  db_data:
