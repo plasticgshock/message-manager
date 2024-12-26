@@ -4,16 +4,13 @@ FROM python:3.9-slim
 # Set the working directory
 WORKDIR /app
 
-# Copy necessary files
-COPY dbcrud.py /app/
-COPY db_config.ini /app/
-COPY requirements.txt /app/
-
-# Install dependencies
+# Copy requirements file and install dependencies
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port
-EXPOSE 5002
+# Copy necessary files
+COPY dbcrud.py /app/
+COPY .gitignore/db_config.ini /app/.gitignore/
 
 # Command to run the app
 CMD ["python", "dbcrud.py"]

@@ -11,10 +11,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the files into the container
 COPY main.py /app/
 COPY requirements.txt /app/
-COPY templates/ /app/templates/
-
-# Expose the Flask app's port
-EXPOSE 5000
+COPY templates/ /app/
 
 # Run the Flask app
-CMD ["python", "dbcrud.py"]
+CMD ["python", "main.py"]
