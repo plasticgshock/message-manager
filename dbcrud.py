@@ -57,23 +57,20 @@ def dbcheck():
             print("Database checked")
 
 
-@app.route('/api-access', methods=['POST', 'GET'])
-def process_request():
+@app.route('/api-access/writemessage', methods=['POST', 'GET'])
+def writemessage():
     dbcheck()
     if request.method == 'GET':
-        return "dbcrud page"
-    if request.json.get('req') == 'create':
-        data = request.json.get('data')
-        ip = request.json.get('ip')
-        agent = request.json.get('agent')
-        if data and ip and agent:
-            response = write_messages(data, ip, agent)
-            print(f"your data: {data}")
-            return jsonify({'response': response})
-        else:
-            return jsonify({'error':'no data provided!'}), 400
-    elif request.json.get('req') == 'read':
-        return jsonify({'response':getmessages()})
+        return "Write message page"
+    data = request.json.get('data')
+    ip = request.json.get('ip')
+    agent = request.json.get('agent')
+    if data and ip and agent:
+        response = write_messages(data, ip, agent)
+        print(f"your data: {data}")
+        return jsonify({'response': response})
+    else:
+        return jsonify({'error':'no data provided!'}), 400
 
 @app.route('/api-access/getmessages', methods=['GET'])
 def producemessages():
