@@ -75,6 +75,11 @@ def process_request():
     elif request.json.get('req') == 'read':
         return jsonify({'response':getmessages()})
 
+@app.route('/api-access/getmessages', methods=['GET'])
+def producemessages():
+    return jsonify(getmessages())
+
+
 
 def parse_db_config(filename='.gitignore/db_config.ini', section='postgresql'):
     parser = ConfigParser()
@@ -94,7 +99,7 @@ def parse_db_config(filename='.gitignore/db_config.ini', section='postgresql'):
 def write_messages(data, ip, agent):
     try:
         connection = None
-        db_config = parse_db_config()   
+        db_config = parse_db_config()
         connection = psycopg2.connect(**db_config)
         cursor = connection.cursor()
         cursor.execute(f'''INSERT INTO requests (content, ip_address, user_agent)

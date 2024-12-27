@@ -46,31 +46,14 @@ def send():
 
 
 @app.route('/messages')
-def DisplayMessages():
-    headers = {'Content-Type': 'application/json'}
-    SERVER_URL = f'{BACKEND_URL}/api-access'
-    
-    # Create the request payload
-    payload = json.dumps({'req':'read'})
-    
-    # Send the POST request to the server
-    response = requests.post(SERVER_URL, data=payload, headers=headers)
-    
-    if response.status_code == 200:
-        # Parse the JSON response from the server
-        messages = response.json().get('response')
-        print("Response from the server received")
-        reversed_messages = dict(reversed(list(messages.items())))
-        return render_template('displaymessages.html', messages=reversed_messages)
-    else:
-        print(f"Error:", response.json().get('error'))
-        return jsonify({'Error!':'error connecting to the db'})
-    
-
-@app.route('/test')
 def test():
-    messages={1:['text','date', 'ip', 'client' ]}
-    return render_template("test.html", messages =messages)
+    SERVER_URL = f'{BACKEND_URL}/api-access/getmessages'
+    response = requests.get(SERVER_URL)
+    if response.status_code == 200:     
+        data = response.json()
+        return render_template('displaymessages.html', messages=data)
+    else:
+        return "ERROR: Database unreachable"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
