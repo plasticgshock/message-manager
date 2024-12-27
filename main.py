@@ -7,9 +7,9 @@ BACKEND_URL = 'http://backend:5002' # имя контейнера в докер�
 
 def write_to_db(content, user_ip, user_agent):
     headers = {'Content-Type': 'application/json'}
-    SERVER_URL = f'{BACKEND_URL}/api-access'
+    SERVER_URL = f'{BACKEND_URL}/api-access/writemessage'
     # Create the request payload
-    payload = json.dumps({'req':'create', 'data':content, 'ip':user_ip, 'agent': user_agent})
+    payload = json.dumps({'data':content, 'ip':user_ip, 'agent': user_agent})
     
     # Send the POST request to the server
     response = requests.post(SERVER_URL, data=payload, headers=headers)
