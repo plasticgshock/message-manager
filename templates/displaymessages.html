@@ -11,12 +11,9 @@
             color: #ffffff;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
         .container {
+            position: relative;
             background: rgba(255, 255, 255, 0.1);
             padding: 20px 40px;
             border-radius: 20px;
@@ -24,11 +21,47 @@
             text-align: left;
             max-width: 600px;
             width: 100%;
+            margin: 50px auto 0; /* Fixed top space of 50px */
         }
-        h1 {
-            font-size: 24px;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .view-messages-btn {
+            background: #2575fc;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s, border-radius 0.5s;
+            text-decoration: none;
             text-align: center;
+        }
+        .view-messages-btn:hover {
+            background: #1a5fb4;
+            border-radius: 20px;
+        }
+        .btn-flip {
+            background: #2575fc;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s, border-radius 0.5s;
+        }
+        .btn-flip:hover {
+            background: #1a5fb4;
+            border-radius: 20px;
         }
         .message-item {
             display: flex;
@@ -38,7 +71,6 @@
             padding: 15px;
             border-radius: 10px;
             box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 100%;
         }
         .message-key {
             width: 40px;
@@ -68,15 +100,24 @@
         }
     </style>
     <script>
-        // Set a time interval to auto-refresh the page (every 10 seconds)
-        setInterval(function() {
-            location.reload();
-        }, 10000); // 10000 milliseconds = 10 seconds
+        // Flip the order of messages
+        function flipMessages() {
+            const container = document.querySelector('.container');
+            const messages = Array.from(document.querySelectorAll('.message-item'));
+            // Reverse the array and re-append elements
+            messages.reverse().forEach(message => container.appendChild(message));
+        }
     </script>
 </head>
 <body>
     <div class="container">
-        <h1>Messages</h1>
+        <div class="header">
+            <h1>Messages</h1>
+            <div class="header-buttons">
+                <a href="/send" class="view-messages-btn">Send</a>
+                <button class="btn-flip" onclick="flipMessages()">⮃</button>
+            </div>
+        </div>
         {% for key, message in messages.items() %}
             <div class="message-item">
                 <div class="message-key">{{ key }}</div>
