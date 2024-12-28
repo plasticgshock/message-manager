@@ -23,6 +23,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             text-align: center;
             max-width: 400px;
+            width: 100%;
         }
         h1 {
             font-size: 24px;
@@ -40,7 +41,13 @@
             box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
             font-size: 16px;
         }
-        input[type="submit"] {
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* Adds space between the buttons */
+            margin-top: 20px;
+        }
+        input[type="submit"], .view-messages-btn {
             background: #2575fc;
             color: #ffffff;
             border: none;
@@ -49,10 +56,22 @@
             font-size: 16px;
             cursor: pointer;
             transition: background 0.3s, border-radius 0.5s;
+            width: 150px; /* Ensures the buttons have the same width */
         }
-        input[type="submit"]:hover {
+        input[type="submit"]:hover, .view-messages-btn:hover {
             background: #1a5fb4;
             border-radius: 20px;
+        }
+        .view-messages-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            background: #2575fc;
+            border-radius: 10px;
+            color: white;
+            text-decoration: none;
+            width: 150px; /* Matches the size of the Send button */
         }
     </style>
 </head>
@@ -61,8 +80,11 @@
         <h1>Send a message</h1>
         <form action="#" method="post">
             <p>Your message:</p>
-            <p><input type="text" name="nm" placeholder="Type your message here"></p>
-            <p><input type="submit" value="Send"></p>
+            <p><input type="text" name="ms" placeholder="Type your message here"></p>
+            <div class="button-container">
+                <p><input type="submit" value="Send"></p>
+                <a href="http://127.0.0.1:5000/messages" class="view-messages-btn">View Messages</a>
+            </div>
         </form>
     </div>
 </body>

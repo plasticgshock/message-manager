@@ -21,7 +21,7 @@ services:
     depends_on:
       - db
     volumes:
-      - .gitignore/db_config.ini:/app/dbconfig.ini
+      - /backend/.gitignore/db_config.ini:/app/dbconfig.ini
     ports:
       - "5002:5002"
 
@@ -34,7 +34,7 @@ services:
     depends_on:
       - back
     volumes:
-      - ./templates:/app/templates
+      - ./frontend/templates:/app/templates
     ports:
       - "5000:5000"
 
