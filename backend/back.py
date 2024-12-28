@@ -57,7 +57,7 @@ def dbcheck():
             print("Database checked")
 
 
-@app.route('/api-access/writemessage', methods=['POST', 'GET'])
+@app.route('/api/v1/postMessage', methods=['POST', 'GET'])
 def writemessage():
     dbcheck()
     if request.method == 'GET':
@@ -72,7 +72,7 @@ def writemessage():
     else:
         return jsonify({'error':'no data provided!'}), 400
 
-@app.route('/api-access/getmessages', methods=['GET'])
+@app.route('/api/v1/getMessages', methods=['GET'])
 def producemessages():
     return jsonify(getmessages())
 
@@ -99,6 +99,7 @@ def write_messages(data, ip, agent):
         db_config = parse_db_config()
         connection = psycopg2.connect(**db_config)
         cursor = connection.cursor()
+        data = checkmessage(data)
         cursor.execute(f'''INSERT INTO requests (content, ip_address, user_agent)
                        VALUES ('{data}', '{ip}', '{agent}' )''')
         connection.commit()
@@ -111,6 +112,11 @@ def write_messages(data, ip, agent):
             connection.close()
             print("PostgreSQL connection is closed")
 
+def checkmessage(data):
+    sym = "'"
+    if sym in data:
+        data = data.replace(sym, ' ')
+    return data
 
 def getmessages():
     connection = None 
