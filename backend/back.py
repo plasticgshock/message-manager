@@ -8,6 +8,21 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 
+def parse_db_config(filename='.gitignore/db_config.ini', section='postgresql'):
+    parser = ConfigParser()
+    parser.read(filename)
+    db_config = {}
+    if parser.has_section(section):
+        params = parser.items(section)
+        for param in params:
+            db_config[param[0]] = param[1]
+        print(db_config)
+    else:
+        raise Exception(f"Section {section} not found in the {filename} file")
+
+    return db_config
+
+
 def createtable():
     db_config = parse_db_config()
     try:
@@ -57,42 +72,6 @@ def dbcheck():
             print("Database checked")
 
 
-@app.route('/api/v1/postMessage', methods=['POST', 'GET'])
-def writemessage():
-    dbcheck()
-    if request.method == 'GET':
-        return "Write message page"
-    data = request.json.get('data')
-    ip = request.json.get('ip')
-    agent = request.json.get('agent')
-    if data and ip and agent:
-        response = write_messages(data, ip, agent)
-        print(f"your data: {data}")
-        return jsonify({'response': response})
-    else:
-        return jsonify({'error':'no data provided!'}), 400
-
-@app.route('/api/v1/getMessages', methods=['GET'])
-def producemessages():
-    return jsonify(getmessages())
-
-
-
-def parse_db_config(filename='.gitignore/db_config.ini', section='postgresql'):
-    parser = ConfigParser()
-    parser.read(filename)
-    db_config = {}
-    if parser.has_section(section):
-        params = parser.items(section)
-        for param in params:
-            db_config[param[0]] = param[1]
-        print(db_config)
-    else:
-        raise Exception(f"Section {section} not found in the {filename} file")
-
-    return db_config
-
-
 def write_messages(data, ip, agent):
     try:
         connection = None
@@ -133,11 +112,12 @@ def getmessages():
                 l = 10
         s = [0]*l
         dict0 = {}
+        print(dict0)
         for i in range(l):
             dict0[messages[i][0]] = [messages[i][j] for j in range(1,5)]
         connection.commit()
         print("Successfully retrieved data")
-        return dict(reversed(list(dict0.items())))
+        return dict0
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL:", error)
     finally:
@@ -145,6 +125,56 @@ def getmessages():
             cursor.close()
             connection.close()
             print("PostgreSQL connection is closed")
+
+
+
+@app.route('/api/v1/postMessage', methods=['POST', 'GET'])
+def writemessage():
+    dbcheck()
+    if request.method == 'GET':
+        return "Write message page"
+    data = request.json.get('data')
+    ip = request.json.get('ip')
+    agent = request.json.get('agent')
+    if data and ip and agent:
+        response = write_messages(data, ip, agent)
+        print(f"your data: {data}")
+        return jsonify({'response': response})
+    else:
+        return jsonify({'error':'no data provided!'}), 400
+
+@app.route('/api/v1/getMessages', methods=['GET'])
+def producemessages():
+    return jsonify(getmessages())
+
+
+@app.route('/api/v1/deleteMessage/<int:message_id>', methods=['DELETE'])
+def delete_message_backend(message_id):
+    dbcheck()
+    try:
+        # Удаление из базы данных
+        params = parse_db_config()
+        connection = psycopg2.connect(**params)
+        cursor = connection.cursor()
+        cursor.execute("DELETE FROM requests WHERE request_id = %s;", (message_id,))
+        connection.commit()
+        return jsonify({"response": "Message deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/v1/dropDatabase')
+def dropdb():
+    try:
+        # Удаление из базы данных
+        params = parse_db_config()
+        params['database'] = 'postgres'
+        connection = psycopg2.connect(**params)
+        connection.autocommit = True
+        cursor = connection.cursor()
+        cursor.execute('''DROP DATABASE messagemanager_db;''')
+        return jsonify({"response": "Message deleted successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':

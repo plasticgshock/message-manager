@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 import requests
 import json
-import os
 
 BACKEND_URL = 'http://backend:5002' # имя контейнера в докере
 
@@ -45,8 +44,8 @@ def send():
     return render_template("sendmessage.html")
 
 
-@app.route('/messages')
-def test():
+@app.route('/messages', methods=['POST', 'GET'])
+def displaymessages():
     SERVER_URL = f'{BACKEND_URL}/api/v1/getMessages'
     response = requests.get(SERVER_URL)
     if response.status_code == 200:     
@@ -54,6 +53,17 @@ def test():
         return render_template('displaymessages.html', messages=data)
     else:
         return "ERROR: Database unreachable"
+    
+
+@app.route('/delete/<message_id>', methods=['DELETE'])
+def delete_message(message_id):
+    SERVER_URL = f'{BACKEND_URL}/api/v1/deleteMessage/{message_id}'
+    response = requests.delete(SERVER_URL)
+    if response.status_code == 200:
+        return jsonify({"success": True, "message": f"Message {message_id} deleted successfully"})
+    else:
+        return jsonify({"success": False, "error": "Failed to delete message"}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
