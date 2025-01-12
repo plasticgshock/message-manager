@@ -63,6 +63,20 @@
             background: #1a5fb4;
             border-radius: 20px;
         }
+        .btn-delete {
+            background: #e74c3c;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s, border-radius 0.5s;
+        }
+        .btn-delete:hover {
+            background: #c0392b;
+            border-radius: 20px;
+        }
         .message-item {
             display: flex;
             align-items: flex-start;
@@ -107,6 +121,27 @@
             // Reverse the array and re-append elements
             messages.reverse().forEach(message => container.appendChild(message));
         }
+        // Функция удаления сообщения через AJAX
+        function deleteMessage(messageId, element) {
+            const xhr = new XMLHttpRequest();
+            xhr.open("DELETE", `/delete/${messageId}`, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        // Удаление HTML элемента сообщения
+                        element.closest('.message-item').remove();
+                        console.log(response.message);
+                    } else {
+                        console.error("Error:", response.error);
+                    }
+                } else {
+                    console.error("Failed to delete message");
+                }
+            };
+            xhr.send();
+        }
     </script>
 </head>
 <body>
@@ -116,6 +151,7 @@
             <div class="header-buttons">
                 <a href="/send" class="view-messages-btn">Send</a>
                 <button class="btn-flip" onclick="flipMessages()">⮃</button>
+                </form>
             </div>
         </div>
         {% for key, message in messages.items() %}
@@ -125,6 +161,7 @@
                     <div class="message-text">{{ message[0] }}</div>
                     <div class="message-time">{{ message[1] }}</div>
                 </div>
+                <button class="btn-delete" onclick="deleteMessage('{{ key }}', this)">×</button>
             </div>
         {% endfor %}
     </div>
