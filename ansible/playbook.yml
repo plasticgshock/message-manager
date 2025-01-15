@@ -1,0 +1,18 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Установить Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Скопировать конфигурацию Nginx
+      copy:
+        src: ../nginx.conf
+        dest: /etc/nginx/nginx.conf
+
+    - name: Перезапустить Nginx
+      service:
+        name: nginx
+        state: restarted

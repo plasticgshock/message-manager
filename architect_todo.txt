@@ -1,0 +1,4 @@
+1. Rewrite for OOP
+* switch to ORM ( SQLalchemy ) 
+2. Make content filter ( po prikolu )
+3. Make authorisation ( jwt )
