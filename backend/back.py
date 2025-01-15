@@ -162,19 +162,31 @@ def delete_message_backend(message_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@app.route('/api/v1/dropDatabase')
-def dropdb():
-    try:
-        # Удаление из базы данных
-        params = parse_db_config()
-        params['database'] = 'postgres'
-        connection = psycopg2.connect(**params)
-        connection.autocommit = True
-        cursor = connection.cursor()
-        cursor.execute('''DROP DATABASE messagemanager_db;''')
-        return jsonify({"response": "Message deleted successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @app.route('/api/v1/dropDatabase')
+# def dropdb():
+#     try:
+#         # Удаление из базы данных
+#         params = parse_db_config()
+#         params['database'] = 'postgres'
+#         connection = psycopg2.connect(**params)
+#         connection.autocommit = True
+#         cursor = connection.cursor()
+#         cursor.execute('''DROP DATABASE messagemanager_db;''')
+#         return jsonify({"response": "Database dropped successfully"}), 200
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
+
+# @app.route('/api/v1/selectAsterisk')
+# def selectall():
+#     try:
+#         params = parse_db_config()
+#         connection = psycopg2.connect(**params)
+#         cursor = connection.cursor()
+#         cursor.execute('''SELECT * FROM requests;''')
+#         return jsonify(cursor.fetchall())
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
