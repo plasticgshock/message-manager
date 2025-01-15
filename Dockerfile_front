@@ -5,13 +5,13 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy requirements file and install dependencies
+COPY frontend/requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the files into the container
 COPY frontend/front.py /app/
-COPY frontend/requirements.txt /app/
 COPY frontend/templates/displaymessages.html /app/templates/
 COPY frontend/templates/sendmessage.html /app/templates/
-RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Run the Flask app

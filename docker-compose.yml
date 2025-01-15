@@ -1,4 +1,7 @@
 version: "v2.32.1"
+networks:
+  dev:
+  
 services:
   nginx:
     image: nginx:latest
@@ -12,6 +15,8 @@ services:
     depends_on:
       - front
       - back
+    networks:
+    - dev
   
   db:
     image: postgres:15
@@ -24,6 +29,8 @@ services:
     - "5432:5432"
     volumes:
     - db_data:/var/lib/postgresql/data
+    networks:
+    - dev
 
 
   back:
@@ -37,6 +44,8 @@ services:
       - /backend/.gitignore/db_config.ini:/app/dbconfig.ini
     ports:
       - "5002:5002"
+    networks:
+    - dev
 
 
   front:
@@ -50,6 +59,8 @@ services:
       - ./frontend/templates:/app/templates
     ports:
       - "5000:5000"
+    networks:
+    - dev
 
 volumes:
   db_data:
