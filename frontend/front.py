@@ -1,6 +1,8 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 import requests
 import json
+from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter
 
 BACKEND_URL = 'http://backend:5002' # имя контейнера в докере
 
@@ -23,12 +25,15 @@ def write_to_db(content, user_ip, user_agent):
 
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app, path="/metrics")
+
+GetRequestCount = Counter('http_get_request_total', 'Total number of GET requests')
+
 
 
 @app.route('/')
 def index():
-    return "hello world"
-
+    return redirect(url_for("send"))
 
 @app.route('/send', methods = ['POST', 'GET'])
 def send():
@@ -41,6 +46,7 @@ def send():
         print(data)
         write_to_db(data["content"], data["ip"], data["user_agent"])
         return redirect(url_for("send"))
+    GetRequestCount.inc()
     return render_template("sendmessage.html")
 
 
@@ -65,5 +71,8 @@ def delete_message(message_id):
         return jsonify({"success": False, "error": "Failed to delete message"}), 500
 
 
+metrics.info('app_info', 'Application info', version='1.0.0')
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)

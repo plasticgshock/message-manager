@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 5s  # Adjust as needed
+
+scrape_configs:
+  - job_name: 'message-manager'
+    metrics_path: '/metrics'
+    scheme: 'https'  # Use HTTPS instead of HTTP
+    static_configs:
+      - targets: ['192.168.1.144']
+    tls_config:
+      insecure_skip_verify: true
+  
+  - job_name: 'node-exporters'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['192.168.1.144:9100']
+    tls_config:
+      insecure_skip_verify: true

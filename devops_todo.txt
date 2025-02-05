@@ -1,0 +1,5 @@
+1. set up nginx as systemd unit, configurate, make nginx shutdown when restart;
+* make only 443 accessible (need tls certificate)
+* do it with ansible
+2. host on sever (Yandex cloud)
+3. set up ci/cd with gitlab ( will need separate vbox with gitlab community edition (in container) and gitlab runner (on host) )
